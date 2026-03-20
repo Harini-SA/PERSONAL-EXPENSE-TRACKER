@@ -25,23 +25,49 @@
 <body class="d-flex justify-content-center align-items-center vh-100">
     <div>
         <div class="card p-2 shadow rounded" style="width: 25rem;">
-            <h1 class="text-center mb-3" style="color: #764ba2;">💰 FinTrack</h1>
+            <h1 class="text-center mb-3" style="color: black;">💰 FinTrack</h1>
 
             <div class="d-flex mb-4">
-                <button class="btn btn-indigo flex-fill me-2">Login</button>
-                <button class="btn btn-indigo flex-fill">Register</button>
+                <button class="btn btn-indigo flex-fill me-2" onclick="showForm('login')">Login</button>
+                <button class="btn btn-indigo flex-fill" onclick="showForm('register')">register</button>
             </div>
 
-            <div class="mb-3">
+            <div class="mb-3" id="loginForm">
+                <form method="post" action="/login">
                 <label class="form-label">Email:</label>
                 <input class="form-control border border-dark " type="email" name="text" required>
                 <label class="form-label">Password:</label>
                 <input class="form-control border border-dark" type="password" name="password" required>
 
-                <button class="btn btn-indigo w-100 mt-4"> Login </button>
+                <button class="btn btn-indigo w-100 mt-4" type="submit"> Login </button>
+                </form>
+            </div>
+            <div class="mb-3" style="display: none;" id="registerForm">
+                <form method="post" action="/register">
+                <label class="form-label">Full Name:</label>
+                <input class="form-control border border-dark" type="text" name="name" required>
+                <label class="form-label">Email:</label>
+                <input class="form-control border border-dark" type="email" name="email" required>
+                <label class="form-label">Password:</label>
+                <input class="form-control border border-dark" type="password" name="password" required>
+                <label class ="form-label">Confirm Password:</label> 
+                <input class="form-control border border-dark" type="password" name="password" required>
+                <button class="btn btn-indigo w-100 mt-4" type="submit"> Register </button> 
+                </form>             
             </div>
         </div>
     </div>
+    <script>
+    function showForm(type) {
+        if (type === 'login') {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+        } else {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+        }
+    }
+</script>
 </body>
 
 </html>
