@@ -152,35 +152,58 @@
     </div>
     <script>
         let expenses = [];
-        let total = 0;
-        let form = document.querySelector('form');
-        form.addEventListener("submit",function(event){
-            event.preventDefault();
-            let name = document.querySelector('input[name = "name"]').value;
-            let amount = document.querySelector('input[name = "amount"]').value;
-            let category = document.querySelector('select[name = "category"]').value;
-            let date = document.querySelector('input[name = "date"]').value;
-            let expense ={
-                name:name,
-                amount:amount,
-                category:category,
-                date:date
-            }
-            total += Number(amount);
-            document.getElementById("total").querySelector("span").textContent = total;
-            expenses.push(expense);
-            form.reset();
-            let tbody = document.getElementById('tbody');
-            tbody.innerHTML += `
-            <tr>
-                <td>${expense.name}</td>
-                <td>${expense.amount}</td>
-                <td>${expense.category}</td>
-                <td>${expense.date}</td>
-                <td><button class="btn btn-sm btn-danger">Delete</button>
-                <button class="btn btn-sm btn-primary">Edit</button></td>
-                </tr>`;  
-        })
+        let id = 1;
+        function renderTable() {
+           let rows = expenses.map(expense =>
+        `<tr>
+            <td>${expense.name}</td>
+            <td>₹${expense.amount}</td>
+            <td>${expense.category}</td>
+            <td>${expense.date}</td>
+            <td>
+                <button class="btn btn-sm btn-danger"
+                        onclick="deleteExpense(${expense.id})">Delete</button>
+                <button class="btn btn-sm btn-primary">Edit</button>
+            </td>
+        </tr>`
+    );
+
+    document.getElementById('tbody').innerHTML = rows.join('');
+
+    let total = expenses.reduce((sum, e) => sum + e.amount, 0);
+    document.getElementById("total").querySelector("span").textContent = '₹' + total;
+}
+
+function deleteExpense(id) {
+    expenses = expenses.filter(e => e.id !== id);
+    renderTable();
+}
+let form = document.querySelector('form');
+
+form.addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    let name     = document.querySelector('input[name="name"]').value.trim();
+    let amount   = Number(document.querySelector('input[name="amount"]').value);
+    let category = document.querySelector('select[name="category"]').value;
+    let date     = document.querySelector('input[name="date"]').value;
+
+    if (!name || !amount || !category || !date) {
+        alert("Please fill all fields");
+        return;
+    }
+
+    expenses.push({
+        id: id++,
+        name: name,
+        amount: amount,     
+        category: category,
+        date: date
+    });
+
+    form.reset();
+    renderTable();          
+});
         
     </script>
 
