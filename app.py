@@ -64,6 +64,28 @@ def add_expense():
     db.session.commit()
     return jsonify(expense.to_dict()), 201
 
+@app.route("/expenses/<int:expense_id>", methods=["DELETE"])
+def delete_expense(expense_id):
+    expense = Expense.query.get(expense_id)
+    if expense:
+        db.session.delete(expense)
+        db.session.commit()
+        return jsonify({"message": "Expense deleted successfully"}), 200
+    return jsonify({"error": "Expense not found"}), 404
+
+@app.route("/expenses/<int:expense_id>", methods=["PUT"])
+def update_expense(expense_id):
+    data = request.get_json()
+    expense = Expense.query.get(expense_id)
+    if expense:
+        expense.name = data["name"]
+        expense.amount = data["amount"]
+        expense.category = data["category"]
+        expense.date = data["date"]
+        db.session.commit()
+        return jsonify(expense.to_dict()), 200
+    return jsonify({"error": "Expense not found"}), 404
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
