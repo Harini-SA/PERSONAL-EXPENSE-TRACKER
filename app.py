@@ -101,8 +101,13 @@ def update_expense(expense_id):
 @app.route("/dashboard/summary",methods=["GET"])
 def dashboard_summary():
     expenses = Expense.query.all()
+    incomes = Income.query.all()
     total_expenses = sum(e.amount for e in expenses)
-    return jsonify({"total_expenses": total_expenses})
+    total_income = sum(i.amount for i in incomes)
+    savings = total_income - total_expenses
+    return jsonify({"total_expenses": total_expenses,
+                    "total_income": total_income,
+                    "savings":savings})
 
 @app.route("/dashboard/recent_transactions", methods = ["GET"])
 def recent_transactions():
@@ -118,7 +123,7 @@ def get_income():
     return jsonify([i.to_dict() for i in income])
 
 @app.route("/income", methods=["POST"])
-def add_income():
+def add_incomes():
     data = request.get_json()
     income = Income(
         name=data["name"],
