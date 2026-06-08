@@ -151,9 +151,8 @@
 
     </div>
     <script>
-        let expenses = [];
-        let id = 1;
-        function renderTable() {
+        let expenses =[];
+        function renderTable(expenses) {
            let rows = expenses.map(expense =>
         `<tr>
             <td>${expense.name}</td>
@@ -163,7 +162,8 @@
             <td>
                 <button class="btn btn-sm btn-danger"
                         onclick="deleteExpense(${expense.id})">Delete</button>
-                <button class="btn btn-sm btn-primary">Edit</button>
+                <button class="btn btn-sm btn-primary"
+                onclick="updateExpense(${expense.id})">Edit</button>
             </td>
         </tr>`
     );
@@ -173,14 +173,26 @@
     let total = expenses.reduce((sum, e) => sum + e.amount, 0);
     document.getElementById("total").querySelector("span").textContent = '₹' + total;
 }
+async function deleteExpense(id) {
+    await fetch(`http://127.0.0.1:5000/expenses/${id}`, {
+        method: "DELETE"
+    });
+    loadExpenses();
+}
+let editingId = null;
+function updateExpense(id){
+    let current = expenses.find(e => e.id === id);
+    document.querySelector('input[name="name"]').value = current.name;
+    document.querySelector('input[name="amount"]').value = current.amount;
+    document.querySelector('select[name="category"]').value = current.category;
+    document.querySelector('input[name="date"]').value = current.date;
+    document.querySelector('form').scrollIntoView({behavior: "smooth"});
+    editingId = id;
 
-function deleteExpense(id) {
-    expenses = expenses.filter(e => e.id !== id);
-    renderTable();
 }
 let form = document.querySelector('form');
 
-form.addEventListener("submit", function(event) {
+form.addEventListener("submit", async function(event) {
     event.preventDefault();
 
     let name     = document.querySelector('input[name="name"]').value.trim();
@@ -193,24 +205,31 @@ form.addEventListener("submit", function(event) {
         return;
     }
 
-    expenses.push({
-        id: id++,
-        name: name,
-        amount: amount,     
-        category: category,
-        date: date
-    });
+    if (editingId) {
+        await fetch(`http://127.0.0.1:5000/expenses/${editingId}`, {
+            method: "PUT",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({name, amount, category, date})
+        });
+
+    } else {
+        await fetch("http://127.0.0.1:5000/expenses", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({name, amount, category, date})
+        });
+    }
 
     form.reset();
-    renderTable();          
+    loadExpenses();
 });
-async function fetchExpenses() {
-    let response = await fetch("http://127.0.0.1:5000/hello");
-    let data = await response.json();
-    console.log(data);}
-fetchExpenses();
-        
-    </script>
+async function loadExpenses() {
+    let response = await fetch("http://127.0.0.1:5000/expenses");
+    expenses = await response.json();
+    renderTable(expenses);
+}
+loadExpenses();
+</script>
 
 </body>
 
