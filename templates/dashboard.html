@@ -67,7 +67,7 @@
             <div class="col-md-3 mb-3">
                 <div class="card p-3 card-income">
                     <p class="text-muted mb-1">Total Income</p>
-                    <h3 class="text-success">₹45,000</h3>
+                    <h3 class="text-success" id="total_income">₹0</h3>
                 </div>
             </div>
 
@@ -81,14 +81,14 @@
             <div class="col-md-3 mb-3">
                 <div class="card p-3 card-savings">
                     <p class="text-muted mb-1">Savings</p>
-                    <h3 style="color: #667eea;">₹16,500</h3>
+                    <h3 style="color: #667eea;" id="savings" >₹0</h3>
                 </div>
             </div>
 
             <div class="col-md-3 mb-3">
                 <div class="card p-3 card-balance">
                     <p class="text-muted mb-1">Balance</p>
-                    <h3 class="text-warning">₹16,500</h3>
+                    <h3 class="text-warning" id="balance">₹0</h3>
                 </div>
             </div>
 
@@ -123,6 +123,7 @@
                     let summary = await fetch("http://127.0.0.1:5000/dashboard/summary");
                     let data = await summary.json();
                     document.getElementById("total_expense").textContent = `₹${data.total_expenses.toFixed(2)}`;
+                    document.getElementById("total_income").textContent = `₹${data.total_income.toFixed(2)}`;
 
                     let transaction = await fetch("http://127.0.0.1:5000/dashboard/recent_transactions");
                     let response = await transaction.json();
