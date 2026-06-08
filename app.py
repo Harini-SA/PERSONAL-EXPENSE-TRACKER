@@ -125,6 +125,32 @@ def dashboard_summary():
 def recent_transactions():
     expenses = Expense.query.order_by(Expense.id.desc()).limit(5).all()
     return jsonify([e.to_dict() for e in expenses])
+
+@app.route("/budget_summary")
+def budget_summary():
+    budgets = Budget.query.all()
+
+    result = []
+
+    for budget in budgets:
+        spent = sum(
+            expense.amount
+            for expense in Expense.query.filter_by(category=budget.category).all()
+        )
+
+        if budget.amount > 0:
+            percentage = min((spent / budget.amount) * 100, 100)
+        else:
+            percentage = 0
+
+        result.append({
+            "category": budget.category,
+            "budget_amount": budget.amount,
+            "spent_amount": spent,
+            "percentage": round(percentage, 2)
+        })
+
+    return jsonify(result)
 @app.route("/add_income", methods=["GET"])
 def add_income():
     return render_template("add_income.html")
@@ -164,10 +190,6 @@ def delete_income(id):
         db.session.commit()
         return jsonify({"message":"income deleted"})
     return jsonify({"error":"error in deleting the expense"}),404
-@app.route("/budget_income", methods=["GET"])
-def budget_get():
-    budget = Budget.query.order_by(Budget.id.desc()).all()
-    return jsonify([b.to_dict() for b in budget])
 @app.route("/budget_income", methods =["POST"])
 def add_budget():
     data = request.get_json()
