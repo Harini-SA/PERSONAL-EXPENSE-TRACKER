@@ -144,6 +144,7 @@ def budget_summary():
             percentage = 0
 
         result.append({
+            "id": budget.id,
             "category": budget.category,
             "budget_amount": budget.amount,
             "spent_amount": spent,
@@ -201,6 +202,16 @@ def add_budget():
     db.session.add(budget)
     db.session.commit()
     return jsonify(budget.to_dict()),201
+@app.route("/budget_income/<int:id>", methods=["DELETE"])
+def delete_budget(id):
+    budget = Budget.query.get(id)
+
+    if budget:
+        db.session.delete(budget)
+        db.session.commit()
+        return jsonify({"message": "Budget deleted"})
+
+    return jsonify({"error": "Budget not found"}), 404
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
