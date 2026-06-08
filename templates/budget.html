@@ -132,10 +132,15 @@
                 <div class="d-flex justify-content-between mb-1">
                     <span>${budget.category}</span>
                     <span class="text-muted">${budget.spent_amount}/${budget.budget_amount}</span>
+                    <button class="btn btn-sm btn-danger"
+                onclick="deleteBudget(${budget.id})">
+            Delete
+        </button>
                 </div>
                 <div class="progress">
                     <div class="progress-bar bg-danger" style="width: ${budget.percentage}%"></div>
                 </div>
+                
             </div>`
             }).join("");
             document.getElementById("budgetlist").innerHTML = budget;
@@ -159,6 +164,13 @@
         )
         loadBudget();
         })
+        async function deleteBudget(id){
+    await fetch(`http://127.0.0.1:5000/budget_income/${id}`, {
+        method: "DELETE"
+    });
+
+    loadBudget();
+}
         async function loadBudget(){
             let response = await fetch("http://127.0.0.1:5000/budget_summary");
             budgets = await response.json();
