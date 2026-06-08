@@ -49,16 +49,17 @@
 
 <body>
     <div class="sidebar">
-        <h2 style="margin-bottom: 30px;">💰 FinTrack</h2>
-        <a href="/dashboard" class="nav-link active">🏠 Dashboard</a>
-        <a href="/add_expense" class="nav-link">💳 Add Expenses</a>
-        <a href="/budget" class="nav-link">📊 Budget</a>
-        <a href="/goals" class="nav-link">🎯 Goals</a>
-        <a href="/login" class="nav-link bg-danger mt-auto">🚪 Logout</a>
+        <h2 style="margin-bottom: 30px;">FinTrack</h2>
+        <a href="/dashboard" class="nav-link active">Dashboard</a>
+        <a href="/add_expense" class="nav-link">Add Expenses</a>
+        <a href="/budget" class="nav-link">Budget</a>
+        <a href="/goals" class="nav-link">Goals</a>
+        <a href="/add_income" class="nav-link">Add Income</a>
+        <a href="/login" class="nav-link bg-danger mt-auto">Logout</a>
     </div>
     <div class="main-content">
 
-        <h2 class="mb-4">Welcome Back 👋</h2>
+        <h2 class="mb-4">Welcome Back </h2>
 
         <!-- Summary Cards -->
         <div class="row mb-4">
@@ -73,7 +74,7 @@
             <div class="col-md-3 mb-3">
                 <div class="card p-3 card-expense">
                     <p class="text-muted mb-1">Total Expenses</p>
-                    <h3 class="text-danger">₹28,500</h3>
+                    <h3 class="text-danger" id="total_expense">₹0</h3>
                 </div>
             </div>
 
@@ -108,30 +109,35 @@
                         <th>Type</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td>Salary</td>
-                        <td>₹45,000</td>
-                        <td>Income</td>
-                        <td>01-03-2026</td>
-                        <td><span class="badge bg-success">Income</span></td>
-                    </tr>
-                    <tr>
-                        <td>Lunch</td>
-                        <td>₹200</td>
-                        <td>Food</td>
-                        <td>12-03-2026</td>
-                        <td><span class="badge bg-danger">Expense</span></td>
-                    </tr>
-                    <tr>
-                        <td>Netflix</td>
-                        <td>₹499</td>
-                        <td>Entertainment</td>
-                        <td>10-03-2026</td>
-                        <td><span class="badge bg-danger">Expense</span></td>
-                    </tr>
+                <tbody id="recent_transactions">
+                    
                 </tbody>
             </table>
+            </div>
+        </div>
+    </div>
+
+       
+            <script>
+                async function dashboard_load(){
+                    let summary = await fetch("http://127.0.0.1:5000/dashboard/summary");
+                    let data = await summary.json();
+                    document.getElementById("total_expense").textContent = `₹${data.total_expenses.toFixed(2)}`;
+
+                    let transaction = await fetch("http://127.0.0.1:5000/dashboard/recent_transactions");
+                    let response = await transaction.json();
+                    let rows = response.map(expense => 
+                    `<tr>
+                        <td>${expense.name}</td>
+                        <td>₹${expense.amount}</td>
+                        <td>${expense.category}</td>
+                        <td>${expense.date}</td>
+                        <td><span class="badge bg-danger">Expense</span></td>
+                    </tr>`);
+                    document.getElementById("recent_transactions").innerHTML = rows.join("");
+                }
+                dashboard_load();
+            </script>
 
 </body>
 
