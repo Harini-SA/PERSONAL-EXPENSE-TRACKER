@@ -38,6 +38,18 @@ class Income(db.Model):
             "amount": self.amount,
             "date": self.date}
 
+class Budget(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    amount = db.Column(db.Float, nullable = False)
+    category = db.Column(db.String(255) , nullable = False)    
+    month = db.Column(db.String(50), nullable = False)
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "amount": self.amount,
+            "category": self.category,
+            "month": self.month}
+
 @app.route("/dashboard")
 def dashboard():
     return render_template("dashboard.html")
@@ -152,7 +164,21 @@ def delete_income(id):
         db.session.commit()
         return jsonify({"message":"income deleted"})
     return jsonify({"error":"error in deleting the expense"}),404
-
+@app.route("/budget_income", methods=["GET"])
+def budget_get():
+    budget = Budget.query.order_by(Budget.id.desc()).all()
+    return jsonify([b.to_dict() for b in budget])
+@app.route("/budget_income", methods =["POST"])
+def add_budget():
+    data = request.get_json()
+    budget = Budget(
+        amount = data["amount"],
+        category = data["category"],
+        month = data["month"]
+    )
+    db.session.add(budget)
+    db.session.commit()
+    return jsonify(budget.to_dict()),201
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
