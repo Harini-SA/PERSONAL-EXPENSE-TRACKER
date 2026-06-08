@@ -25,6 +25,18 @@ class Expense(db.Model):
             "amount": self.amount,
             "category": self.category,
             "date": self.date}
+class Income(db.Model):
+    id =db.Column(db.Integer,primary_key = True)
+    name = db.Column(db.String(255), nullable = False)
+    amount = db.Column(db.Float, nullable = False)
+    date = db.Column(db.String(100), nullable = False)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "amount": self.amount,
+            "date": self.date}
 
 @app.route("/dashboard")
 def dashboard():
@@ -85,6 +97,56 @@ def update_expense(expense_id):
         db.session.commit()
         return jsonify(expense.to_dict()), 200
     return jsonify({"error": "Expense not found"}), 404
+
+@app.route("/dashboard/summary",methods=["GET"])
+def dashboard_summary():
+    expenses = Expense.query.all()
+    total_expenses = sum(e.amount for e in expenses)
+    return jsonify({"total_expenses": total_expenses})
+
+@app.route("/dashboard/recent_transactions", methods = ["GET"])
+def recent_transactions():
+    expenses = Expense.query.order_by(Expense.id.desc()).limit(5).all()
+    return jsonify([e.to_dict() for e in expenses])
+@app.route("/add_income", methods=["GET"])
+def add_income():
+    return render_template("add_income.html")
+
+@app.route("/income", methods=["GET"])
+def get_income():
+    income = Income.query.order_by(Income.id.desc()).all()
+    return jsonify([i.to_dict() for i in income])
+
+@app.route("/income", methods=["POST"])
+def add_income():
+    data = request.get_json()
+    income = Income(
+        name=data["name"],
+        amount=data["amount"],
+        date=data["date"]
+    )
+    db.session.add(income)
+    db.session.commit()
+    return jsonify(income.to_dict()), 201
+@app.route("/income/<int:income_id>", methods=["PUT"])
+def edit_income(income_id):
+    data = request.get_json()
+    income = Income.query.get(income_id)
+    if income:
+        income.name = data["name"]
+        income.amount = data["amount"]
+        income.date = data["date"]
+        db.session.commit()
+        return jsonify(income.to_dict()), 200
+    return jsonify({"error": "Income not found"}), 404
+@app.route("/income/<int:id>", methods=["DELETE"])
+def delete_income(id):
+    income = Income.query.get(id)
+    if income:
+        db.session.delete(income)
+        db.session.commit()
+        return jsonify({"message":"income deleted"})
+    return jsonify({"error":"error in deleting the expense"}),404
 
 if __name__ == "__main__":
     with app.app_context():
