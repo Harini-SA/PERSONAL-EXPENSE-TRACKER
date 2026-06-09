@@ -189,5 +189,15 @@
             </div>
         </div>
     </div>
+    <script>
+        let goals= []
+
+        async function loadGoals(){
+            let response = await fetch("http://127.0.0.1:5000/api/goals");
+            goals = await response.json();
+            renderGoals(goals)
+        }
+        loadGoals();
+    </script>
 </body>
 </html>
