@@ -229,6 +229,7 @@ def delete_budget(id):
 
     return jsonify({"error": "Budget not found"}), 404
 
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
