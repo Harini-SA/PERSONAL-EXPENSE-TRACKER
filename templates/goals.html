@@ -84,7 +84,7 @@
                     </div>
                     <div class="col-md-3 mb-3">
                         <label class="form-label">Target Amount</label>
-                        <input type="number" class="form-control"name="target" placeholder="eg. 50000">
+                        <input type="number" class="form-control" name="target" placeholder="eg. 50000">
                     </div>
 
                     <div class="col-md-3 mb-3">
@@ -110,10 +110,15 @@
         </div>
     </div>
     <script>
-        let goals= []
-        function renderGoals(goals){
-            let percentage = ((goal.saved / goal.target) * 100).toFixed(0);
+        let goals = []
+        function getColor(percent) {
+            if (percent < 50) return "bg-danger";
+            if (percent < 80) return "bg-warning";
+            return "bg-success";
+        }
+        function renderGoals(goals) {
             let rows = goals.map(goal => {
+                let percentage = Math.min(((goal.saved / goal.target) * 100).toFixed(0), 100);
                 return `
                 <div class="col-md-6 mt-3 mb-4">
                 <div class="card p-4 goal-card">
@@ -125,8 +130,9 @@
                         <span class="text-muted">Target:${goal.target}</span>
                     </div>
                     <div class="progress mb-2">
-                        <div class="progress-bar bg-warning" style="width: ${percentage}%"></div>
-                    </div>
+<div class="progress-bar ${getColor(percentage)}"
+     style="width:${percentage}%">
+</div>                    </div>
                     <div class="d-flex justify-content-between">
                         <small class="text-muted">
                             <i class="bi bi-calendar"></i> Deadline: ${goal.deadline}
@@ -145,9 +151,28 @@
             document.getElementById("goals").innerHTML = rows;
         }
         let form = document.querySelector("form");
+        form.addEventListener("submit", async function apiGoals(event) {
+            event.preventDefault();
+            let name = document.querySelector('input[name="name"]').value;
+            let target = document.querySelector('input[name="target"]').value;
+            let saved = document.querySelector('input[name="saved"]').value
+            let deadline = document.querySelector('input[name="deadline"]').value;
+            if (!name || !target || !saved || !deadline) {
+                alert("please fill all the details");
+                return
+            }
+            form.reset();
+            await fetch("http://127.0.0.1:5000/api/goals", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, target, saved, deadline }),
+
+            })
+            loadGoals();
+        })
 
 
-        async function loadGoals(){
+        async function loadGoals() {
             let response = await fetch("http://127.0.0.1:5000/api/goals");
             goals = await response.json();
             renderGoals(goals)
@@ -155,4 +180,5 @@
         loadGoals();
     </script>
 </body>
+
 </html>
