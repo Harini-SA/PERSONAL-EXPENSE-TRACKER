@@ -228,7 +228,32 @@ def delete_budget(id):
         return jsonify({"message": "Budget deleted"})
 
     return jsonify({"error": "Budget not found"}), 404
-
+@app.route("/api/goals", methods=["GET"])
+def get_goals():
+    goals = Goal.query.order_by(Goal.id.desc()).all()
+    return jsonify([g.to_dict() for g in goals])
+@app.route("/api/goals", methods=["POST"])
+def post_goals():
+    data = request.get_json()
+    goals = Goal(name=data["name"], saved = data["saved"], target = data["target"],deadline = data["deadline"])
+    db.session.add(goals)
+    db.session.commit()
+    return jsonify(goals.to_dict())
+@app.route("/api/goals/<int:id>", methods= ["DELETE"])
+def delete_goals(id):
+    goals = Goal.query.get(id)
+    if goals:
+        db.session.delete(goals)
+        db.session.commit()
+        return jsonify({"message":"deleted successfully"})
+@app.route("/api/goals/<int:id>", methods=["PUT"])
+def update_goals(id):
+    goals = Goal.query.get(id)
+    if goals:
+        data = request.get_json()
+        goals.saved += float(data["saved"])
+        db.session.commit()
+        return jsonify(goals.to_dict())    
 
 if __name__ == "__main__":
     with app.app_context():
