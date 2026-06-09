@@ -170,6 +170,13 @@
             })
             loadGoals();
         })
+        async function deleteGoal(id){
+            await fetch(`http://127.0.0.1:5000/api/goals/${id}`,{
+                method: "DELETE"
+
+            });
+            loadGoals();
+        }
 
 
         async function loadGoals() {
