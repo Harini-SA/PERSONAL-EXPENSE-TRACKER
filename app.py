@@ -49,6 +49,22 @@ class Budget(db.Model):
             "amount": self.amount,
             "category": self.category,
             "month": self.month}
+class Goal(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String(255), nullable = False)
+    saved = db.Column(db.Float, nullable = False)
+    target = db.Column(db.Float, nullable = False)
+    deadline = db.Column(db.String(255), nullable= False)
+
+    def to_dict(self):
+        return {
+            "id" : self.id,
+            "name": self.name,
+            "saved": self.saved,
+            "target": self.target,
+            "deadline": self.deadline
+        }
+
 
 @app.route("/dashboard")
 def dashboard():
@@ -212,6 +228,7 @@ def delete_budget(id):
         return jsonify({"message": "Budget deleted"})
 
     return jsonify({"error": "Budget not found"}), 404
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
