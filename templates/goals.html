@@ -174,11 +174,30 @@
             })
             loadGoals();
         })
-        async function deleteGoal(id){
-            await fetch(`http://127.0.0.1:5000/api/goals/${id}`,{
+        async function deleteGoal(id) {
+            await fetch(`http://127.0.0.1:5000/api/goals/${id}`, {
                 method: "DELETE"
 
             });
+            loadGoals();
+        }
+        async function addSavings(id) {
+            let amount = prompt("Enter amount to add:");
+
+            if (!amount || amount <= 0) {
+                return;
+            }
+
+            await fetch(`http://127.0.0.1:5000/api/goals/${id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    saved: amount
+                })
+            });
+
             loadGoals();
         }
 
