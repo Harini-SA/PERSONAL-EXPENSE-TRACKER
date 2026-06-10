@@ -79,6 +79,28 @@ def dashboard():
 def login():
     return render_template("login.html")
 
+@app.route("/register", methods=["POST"])
+def register():
+    name = request.form["name"]
+    email = request.form["email"]
+    password = request.form["password"]
+
+    existing_user = User.query.filter_by(email=email).first()
+
+    if existing_user:
+        return "Email already exists"
+
+    user = User(
+        name=name,
+        email=email,
+        password=password
+    )
+
+    db.session.add(user)
+    db.session.commit()
+
+    return render_template("login.html")
+
 @app.route("/budget")
 def budget():
     return render_template("budget.html")
