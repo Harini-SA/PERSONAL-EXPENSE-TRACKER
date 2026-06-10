@@ -19,6 +19,9 @@ class User(db.Model):
 class Expense(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
+    user_id = db.Column(db.Integer,
+                        db.ForeignKey("user.id"),
+                        nullable=False)
     amount = db.Column(db.Float, nullable=False)
     category = db.Column(db.String(100), nullable=False)
     date = db.Column(db.String(100), nullable=False)
@@ -32,6 +35,9 @@ class Expense(db.Model):
             "date": self.date}
 class Income(db.Model):
     id =db.Column(db.Integer,primary_key = True)
+    user_id = db.Column(db.Integer,
+                        db.ForeignKey("user.id"),
+                        nullable=False)
     name = db.Column(db.String(255), nullable = False)
     amount = db.Column(db.Float, nullable = False)
     date = db.Column(db.String(100), nullable = False)
@@ -45,6 +51,9 @@ class Income(db.Model):
 
 class Budget(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer,
+                        db.ForeignKey("user.id"),
+                        nullable=False)
     amount = db.Column(db.Float, nullable = False)
     category = db.Column(db.String(255) , nullable = False)    
     month = db.Column(db.String(50), nullable = False)
@@ -56,6 +65,9 @@ class Budget(db.Model):
             "month": self.month}
 class Goal(db.Model):
     id = db.Column(db.Integer, primary_key = True)
+    user_id = db.Column(db.Integer,
+                        db.ForeignKey("user.id"),
+                        nullable=False)
     name = db.Column(db.String(255), nullable = False)
     saved = db.Column(db.Float, nullable = False)
     target = db.Column(db.Float, nullable = False)
