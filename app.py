@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template, request, redirect
+from flask import Flask, jsonify, render_template, request, redirect, session
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 import os
@@ -7,6 +7,7 @@ app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "expenses.db")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.secret_key = "your_secret_key"
 
 db = SQLAlchemy(app)
 CORS(app)
@@ -100,6 +101,7 @@ def login():
         ).first()
 
         if user:
+            session["user_id"] = user.id 
             return redirect("/dashboard")
 
         return "Invalid email or password"
@@ -142,13 +144,16 @@ def goals():
 
 @app.route("/expenses", methods=["GET"])
 def get_expense():
-    expense = Expense.query.order_by(Expense.id.desc()).all()
+    expense = Expense.query.filter_by(
+        user_id=session["user_id"]
+    ).order_by(Expense.id.desc()).all()
     return jsonify([e.to_dict() for e in expense])
 
 @app.route("/expenses", methods=["POST"])
 def add_expense():
     data = request.get_json()
     expense = Expense(
+        user_id=session["user_id"],
         name=data["name"],
         amount=data["amount"],
         category=data["category"],
@@ -201,8 +206,9 @@ def recent_transactions():
 
 @app.route("/budget_summary")
 def budget_summary():
-    budgets = Budget.query.all()
-
+    budgets = Budget.query.filter_by(
+    user_id=session["user_id"]
+).all()
     result = []
 
     for budget in budgets:
@@ -231,13 +237,16 @@ def add_income():
 
 @app.route("/income", methods=["GET"])
 def get_income():
-    income = Income.query.order_by(Income.id.desc()).all()
+    income = Income.query.filter_by(
+        user_id=session["user_id"]
+    ).order_by(Income.id.desc()).all()
     return jsonify([i.to_dict() for i in income])
 
 @app.route("/income", methods=["POST"])
 def add_incomes():
     data = request.get_json()
     income = Income(
+        user_id=session["user_id"],
         name=data["name"],
         amount=data["amount"],
         date=data["date"]
@@ -268,6 +277,7 @@ def delete_income(id):
 def add_budget():
     data = request.get_json()
     budget = Budget(
+        user_id=session["user_id"],
         amount = data["amount"],
         category = data["category"],
         month = data["month"]
@@ -287,12 +297,14 @@ def delete_budget(id):
     return jsonify({"error": "Budget not found"}), 404
 @app.route("/api/goals", methods=["GET"])
 def get_goals():
-    goals = Goal.query.order_by(Goal.id.desc()).all()
+    goals = Goal.query.filter_by(
+        user_id=session["user_id"]
+    ).order_by(Goal.id.desc()).all()
     return jsonify([g.to_dict() for g in goals])
 @app.route("/api/goals", methods=["POST"])
 def post_goals():
     data = request.get_json()
-    goals = Goal(name=data["name"], saved = data["saved"], target = data["target"],deadline = data["deadline"])
+    goals = Goal(user_id=session["user_id"],name=data["name"], saved = data["saved"], target = data["target"],deadline = data["deadline"])
     db.session.add(goals)
     db.session.commit()
     return jsonify(goals.to_dict())
