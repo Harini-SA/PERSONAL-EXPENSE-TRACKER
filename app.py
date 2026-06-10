@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, redirect
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 import os
@@ -75,8 +75,23 @@ class Goal(db.Model):
 def dashboard():
     return render_template("dashboard.html")
 
-@app.route("/login")
+@app.route("/login", methods=["GET", "POST"])
 def login():
+    if request.method == "POST":
+
+        email = request.form["email"]
+        password = request.form["password"]
+
+        user = User.query.filter_by(
+            email=email,
+            password=password
+        ).first()
+
+        if user:
+            return redirect("/dashboard")
+
+        return "Invalid email or password"
+
     return render_template("login.html")
 
 @app.route("/register", methods=["POST"])
