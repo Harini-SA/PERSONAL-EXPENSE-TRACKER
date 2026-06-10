@@ -122,8 +122,10 @@
                 async function dashboard_load(){
                     let summary = await fetch("http://127.0.0.1:5000/dashboard/summary");
                     let data = await summary.json();
-                    document.getElementById("total_expense").textContent = `₹${data.total_expenses.toFixed(2)}`;
-                    document.getElementById("total_income").textContent = `₹${data.total_income.toFixed(2)}`;
+                    document.getElementById("total_expense").textContent = `${data.total_expenses.toFixed(2)}`;
+                    document.getElementById("total_income").textContent = `${data.total_income.toFixed(2)}`;
+                    document.getElementById("savings").textContent =`${data.savings.toFixed(2)}`;
+                    document.getElementById("balance").textContent = `${data.balance.toFixed(2)}`; 
 
                     let transaction = await fetch("http://127.0.0.1:5000/dashboard/recent_transactions");
                     let response = await transaction.json();
