@@ -130,12 +130,15 @@ def update_expense(expense_id):
 def dashboard_summary():
     expenses = Expense.query.all()
     incomes = Income.query.all()
+    goals = Goal.query.all()
+    total_savings = sum(g.saved for g in goals)
     total_expenses = sum(e.amount for e in expenses)
     total_income = sum(i.amount for i in incomes)
-    savings = total_income - total_expenses
+    balance = total_income - total_expenses - total_savings
     return jsonify({"total_expenses": total_expenses,
                     "total_income": total_income,
-                    "savings":savings})
+                    "savings":total_savings,
+                    "balance": balance})
 
 @app.route("/dashboard/recent_transactions", methods = ["GET"])
 def recent_transactions():
