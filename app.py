@@ -187,9 +187,12 @@ def update_expense(expense_id):
 
 @app.route("/dashboard/summary",methods=["GET"])
 def dashboard_summary():
-    expenses = Expense.query.all()
-    incomes = Income.query.all()
-    goals = Goal.query.all()
+    expenses = Expense.query.filter_by(
+        user_id=session["user_id"]).all()
+    incomes = Income.query.filter_by(
+        user_id=session["user_id"]).all()
+    goals = Goal.query.filter_by(
+        user_id=session["user_id"]).all()
     total_savings = sum(g.saved for g in goals)
     total_expenses = sum(e.amount for e in expenses)
     total_income = sum(i.amount for i in incomes)
@@ -201,7 +204,8 @@ def dashboard_summary():
 
 @app.route("/dashboard/recent_transactions", methods = ["GET"])
 def recent_transactions():
-    expenses = Expense.query.order_by(Expense.id.desc()).limit(5).all()
+    expenses = Expense.query.filter_by(
+        user_id=session["user_id"]).order_by(Expense.id.desc()).limit(5).all()
     return jsonify([e.to_dict() for e in expenses])
 
 @app.route("/budget_summary")
@@ -322,7 +326,7 @@ def update_goals(id):
         data = request.get_json()
         goals.saved += float(data["saved"])
         db.session.commit()
-        return jsonify(goals.to_dict())    
+        return jsonify(goals.to_dict())      
 
 if __name__ == "__main__":
     with app.app_context():
