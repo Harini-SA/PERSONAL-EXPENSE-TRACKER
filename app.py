@@ -218,7 +218,7 @@ def budget_summary():
     for budget in budgets:
         spent = sum(
             expense.amount
-            for expense in Expense.query.filter_by(category=budget.category).all()
+            for expense in Expense.query.filter_by(category=budget.category, user_id=session["user_id"]).all()
         )
 
         if budget.amount > 0:
